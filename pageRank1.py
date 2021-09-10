@@ -48,3 +48,21 @@ for path in paths:
     end += b
 
 print(len(start),len(end))
+graph_df = pd.DataFrame()
+graph_df['start'] = start
+graph_df['end'] = end
+
+g = gr.Graph.DataFrame(graph_df)
+#import matplotlib.pyplot as plt
+#s = plt.subplots()
+gr.plot(g, vertex_size = 10, edge_arrow_size = 0.4, edge_width = 0.5)
+
+"""
+x = ['a','b','<','c','d','<','<','<','e','f']
+a = x[:-1]
+b = x[1:]
+fixDepart(a)
+print(a)
+fixEnd(b)
+print(b)
+"""
