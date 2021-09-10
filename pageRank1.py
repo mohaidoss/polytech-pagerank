@@ -48,7 +48,3 @@ for path in paths:
     end += b
 
 print(len(start),len(end))
-
-x = ['a','b','c','d','e','<','<','<','z']
-fixDepart(x)
-print(x)
