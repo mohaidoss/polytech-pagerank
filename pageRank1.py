@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import igraph as gr
 
@@ -47,22 +48,33 @@ for path in paths:
     start += a
     end += b
 
-print(len(start),len(end))
 graph_df = pd.DataFrame()
 graph_df['start'] = start
 graph_df['end'] = end
 
-g = gr.Graph.DataFrame(graph_df)
-#import matplotlib.pyplot as plt
-#s = plt.subplots()
-gr.plot(g, vertex_size = 10, edge_arrow_size = 0.4, edge_width = 0.5)
 
-"""
-x = ['a','b','<','c','d','<','<','<','e','f']
-a = x[:-1]
-b = x[1:]
-fixDepart(a)
-print(a)
-fixEnd(b)
-print(b)
-"""
+g = gr.Graph.DataFrame(graph_df)
+#gr.plot(g, vertex_size = 10, edge_arrow_size = 0.4, edge_width = 0.5)
+gr.summary(g)
+
+#Fonction qui retourne un dictionnaire pour chaque source donnée avec chaine de markov (target[key], probability[value])
+def weight_source(g,vertex):#8 14th_century
+    l = []
+    source = vertex.attributes()['name']
+    for e in vertex.incident():
+        l += [g.vs[e.target].attributes()['name']]
+    data = {x:l.count(x)/len(l) for x in l}
+    return source, data
+
+df_index =[]
+data =[]
+# Boucle sur chaque vertex
+for vertex in g.vs:
+    i, buff = weight_source(g,vertex)
+    df_index.append(i)
+    data.append(buff)
+
+#df_index contient le nom des vertex, data contient la ligne (target) pour chaque index
+mx_markov = pd.DataFrame(data, index=df_index, columns=df_index)    # index = columns pour avoir une matrice NxN
+mx_markov.fillna(0, inplace = True) #Remplacer les NaN
+print(mx_markov)
