@@ -1,6 +1,7 @@
-import numpy as np
 import pandas as pd
 import igraph as gr
+Beta_parameter = 0.85
+
 
 def fixDepart(l):
     try:
@@ -77,4 +78,7 @@ for vertex in g.vs:
 #df_index contient le nom des vertex, data contient la ligne (target) pour chaque index
 mx_markov = pd.DataFrame(data, index=df_index, columns=df_index)    # index = columns pour avoir une matrice NxN
 mx_markov.fillna(0, inplace = True) #Remplacer les NaN
-print(mx_markov)
+#print(mx_markov) 
+
+# PageRank algorithm
+#print(g.pagerank())
