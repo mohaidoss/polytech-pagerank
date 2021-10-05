@@ -133,10 +133,10 @@ print(ranking_df.sort_values(by=['rank'], ascending=False).head(n=20))
 
 # PageRank Personnalisé
 # Mehdi Moussaif : M.M ==> un seul noeud : ligne 26
-print(ranking_df.index[13])
+print(ranking_df.index[25])
 # Initialisation du vecteur
 b_k_1 = np.full(N,0)
-b_k_1[13] = 1
+b_k_1[25] = 1
 
 # Méthode de la puissance avec 1 noeud - execution
 b_k = powermethod(A_norm,b_k_1,Beta_parameter,1)
