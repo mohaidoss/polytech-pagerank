@@ -4,7 +4,7 @@ import numpy as np
 import time 
 
 Beta_parameter = 0.85
-epsilon = 0.001
+epsilon = 10**(-9)
 
 def fixDepart(l):
     try:
@@ -103,9 +103,11 @@ mx_markov.fillna(0, inplace = True) #Remplacer les NaN
 def powermethod(A,r_vector,Beta_parameter,k):
     P_q = A.dot(r_vector)
     r_vector = Beta_parameter*P_q + (1-Beta_parameter)*(np.sum(r_vector))/k
-    return r_vector
+    return r_vector/np.sum(np.abs(r_vector))
 
 
+#output = gr.plot(g, vertex_size = 10, edge_arrow_size = 0.5, edge_width = 0.3)
+#output.save("graph.png")
 
 
 # Initialisation du vecteur
@@ -116,7 +118,7 @@ start_time = time.time()
 b_k = powermethod(A_norm,b_k_1,Beta_parameter,N)
 
 iter = 1
-while ((b_k_1 - b_k) > epsilon).any() :
+while (np.sum(np.abs(b_k_1 - b_k))) > epsilon :
     b_k_1 = b_k
     b_k = powermethod(A_norm,b_k_1,Beta_parameter,N)
     iter += 1
@@ -141,7 +143,7 @@ b_k_1[25] = 1
 # Méthode de la puissance avec 1 noeud - execution
 b_k = powermethod(A_norm,b_k_1,Beta_parameter,1)
 
-while ((b_k_1 - b_k) > epsilon).any() :
+while (np.sum(np.abs(b_k_1 - b_k)) > epsilon) :
     b_k_1 = b_k
     b_k = powermethod(A_norm,b_k_1,Beta_parameter,1)
     iter += 1
