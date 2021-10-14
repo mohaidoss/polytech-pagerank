@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 Beta_parameter = 0.85
-epsilon = 10**(-3)
-# Fonctions pour arranger notre fichier en noeuds connectés, et pour effacer les '<'
+epsilon = 10**(-9)
+
 def fixDepart(l):
     try:
         i_to_delete = l.index('<')
@@ -43,7 +43,6 @@ dataframe = pd.read_csv('wikispeedia_paths-and-graph/paths_finished.tsv',header 
 start = []
 end = []
 paths=dataframe[3]
-# Enregistrement des noeuds de départ et d'arrivée
 for path in paths:
     path_string = path.split(';')
     a = path_string[:-1]
@@ -104,55 +103,42 @@ mx_markov.fillna(0, inplace = True) #Remplacer les NaN
 #A_norm= mx_markov.to_numpy().T
 """
 
-# Calcul vecteur propre
-# A est une matrice numpy, r_vector est notre vecteur d'essai, Beta est le damping factor
-def powermethod(A,r_vector,Beta_parameter):
+# Calcul vecteur propre avec noeuds
+# A est une matrice numpy, r_vector est notre vecteur d'essai, Beta est le damping factor, k représente notre liste de noeuds (PPR)
+def powermethod_noeuds(A,r_vector,Beta_parameter,k):
+    v = np.full(N,0)
+    for i in k:
+        v[i] = 1
+    v = v.T
     P_q = A.dot(r_vector)
-    r_vector = Beta_parameter*P_q + (1-Beta_parameter)*(np.sum(r_vector))/N
+    r_vector = Beta_parameter*P_q + (1-Beta_parameter)*(v*np.sum(r_vector))/len(k)
     return r_vector/np.sum(np.abs(r_vector))
 
 
+# PageRank Personnalisé
+# Mehdi Moussaif : M.M ==> un seul noeud : ligne 26
+
+#Liste des noeuds PPR
+list_noeuds = [25]
+
 # Initialisation du vecteur
-b_k_1 = np.full(N,1)
+b_k_1 = np.full(N,0)
+for i in list_noeuds:
+    b_k_1[i] = 1
 
-# Méthode de la puissance - execution
-b_k = powermethod(A_norm,b_k_1,Beta_parameter)
-# Boucle de convergence
+# Méthode de la puissance avec 1 noeud - execution
+b_k = powermethod_noeuds(A_norm,b_k_1,Beta_parameter,list_noeuds)
 iter = 1
-while (np.sum(np.abs(b_k_1 - b_k))) > epsilon :
+# Boucle de convergence
+while (np.sum(np.abs(b_k_1 - b_k)) > epsilon) :
     b_k_1 = b_k
-    b_k = powermethod(A_norm,b_k_1,Beta_parameter)
+    b_k = powermethod_noeuds(A_norm,b_k_1,Beta_parameter,list_noeuds)
     iter += 1
-
-# Temps d'execution de l'algorithme et nombre d'itération
 print("Beta = ", Beta_parameter, iter)
-
-# Liste finale du PageRank, avec le nom des pages en index
 ranking_df = pd.DataFrame(b_k,index=g.vs()["name"], columns=['rank'])
+ranking_df['rank'] = b_k
 
+# Nom des noeuds, et top 20
+
+print("Notre liste de noeuds choisis :",[ranking_df.index[x] for x in list_noeuds])
 print(ranking_df.sort_values(by=['rank'], ascending=False).head(n=20))
-
-
-
-# Experience : Variation de Beta - Figure
-x =[]
-y =[]
-for Beta_parameter in np.arange(0.1,1,0.05):
-    b_k_1 = np.full(N,1)
-
-    # Méthode de la puissance - execution
-    b_k = powermethod(A_norm,b_k_1,Beta_parameter)
-
-    iter = 1
-    while (np.sum(np.abs(b_k_1 - b_k))) > epsilon :
-        b_k_1 = b_k
-        b_k = powermethod(A_norm,b_k_1,Beta_parameter)
-        iter += 1
-    x.append(Beta_parameter)
-    y.append(iter)
-
-plt.plot(x,y)
-plt.xlabel("Beta_parameter")
-plt.ylabel("iterations")
-# plot
-#plt.show()
