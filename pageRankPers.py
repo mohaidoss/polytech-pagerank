@@ -140,5 +140,6 @@ ranking_df['rank'] = b_k
 
 # Nom des noeuds, et top 20
 
-print("Notre liste de noeuds choisis :",[ranking_df.index[x] for x in list_noeuds])
+print("Notre liste des noeuds choisis :",[x for x in list_noeuds])
+print("Nom des noeuds choisis :",[ranking_df.index[x] for x in list_noeuds])
 print(ranking_df.sort_values(by=['rank'], ascending=False).head(n=20))
